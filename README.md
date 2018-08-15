@@ -31,6 +31,6 @@ Basics of setting up a single Linux server/client environment
 
 - [Exercise 6 - Hello World](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h6.md)
 
-- [Exercise 7 - Exam sample](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h7.md)
+- [Exercise 7 - Laboratory test](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h7.md)
 
 - [Exam structure](https://github.com/Fincer/linux_server_setup/blob/master/exercises/exam.md)
