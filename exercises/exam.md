@@ -1,4 +1,6 @@
-0) Check critical commands
+### This file defines the structure of the real laboratory test which was performed as a part of the Linux server course in Haaga-Helia University of Applied Sciences in spring 2018.
+
+0) Check existence of critical commands
 
 1) Set up SSH & Apache
 
@@ -9,8 +11,7 @@
     
     - Test Apache
     - Remove Apache default site
-    - Strict Apache security policy
-        - Apply custom patch to the source code
+    - Harden Apache security policy
     
     - Remove root login
     - Restrict root accessibility
@@ -26,10 +27,12 @@
 
 3) Set up firewall configuration with ufw
 
-4) Set up a PHP website that takes user input and writes it into MySQL database
+4) Set up a PHP website that takes user input and writes it into MySQL database in the web browser view
 
 5) Set up and install Wordpress
     
     - Points to different DNS (/etc/hosts)
+    - Create a symbolic link from /usr/share/wordpress to /var/www/html/wordpress
 
 6) Check /var/log/auth.log for any suspicious SSH login attempts
+    - multiple entries were present (you need to parse the log file to see all suspicious entries!)
