@@ -19,18 +19,18 @@ Basics of setting up a single Linux server/client environment
 
 ## Table of contents
 
-- [Exercise 1](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h1.md)
+- [Exercise 1 - Installing & getting familiar with a Linux OS](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h1.md)
 
-- [Exercise 2](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h2.md)
+- [Exercise 2 - Simple log analysis](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h2.md)
 
-- [Exercise 3](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h3.md)
+- [Exercise 3 - Setting up Apache & PHP](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h3.md)
 
-- [Exercise 4](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h4.md)
+- [Exercise 4 - Apache web development environment configuration for a regular user](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h4.md)
 
-- [Exercise 5](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h5.md)
+- [Exercise 5 - SSH and Linux system statistics](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h5.md)
 
-- [Exercise 6](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h6.md)
+- [Exercise 6 - Hello World](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h6.md)
 
-- [Exercise 7](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h7.md)
+- [Exercise 7 - Exam sample](https://github.com/Fincer/linux_server_setup/blob/master/exercises/h7.md)
 
-- [Exam](https://github.com/Fincer/linux_server_setup/blob/master/exercises/exam.md)
+- [Exam structure](https://github.com/Fincer/linux_server_setup/blob/master/exercises/exam.md)
