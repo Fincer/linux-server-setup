@@ -1,4 +1,4 @@
-README - Basics of setting up a single Linux server/client environment
+Basics of setting up a single Linux server/client environment
 ==============
 
 - This repository is related to single-server/client Linux (server) environments.
