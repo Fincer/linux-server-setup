@@ -1,0 +1,34 @@
+Author: Pekka Helenius (~Fincer), 2018
+
+Patch: Remove error HTML body from Apache server output message.
+
+Removes additional error messages as well.
+Do not give any hints about existence of Apache ErrorDocument to the client.
+
+This patch is useful in some cases but can bury underneath problems in server
+configuration. Thus, use discretion before implementing the patch
+in your Apache server.
+
+This patch removes default error pages returned by an erroneous HTTP request.
+If you need to use error pages, customize them in your Apache configs with ErrorDocument.
+
+--- a/modules/http/http_protocol.c
++++ b/modules/http/http_protocol.c
+@@ -1531,7 +1531,7 @@ AP_DECLARE(void) ap_send_error_response(
+         /* can't count on a charset filter being in place here,
+          * so do ebcdic->ascii translation explicitly (if needed)
+          */
+-
++/*
+         ap_rvputs_proto_in_ascii(r,
+                   DOCTYPE_HTML_2_0
+                   "<html><head>\n<title>", title,
+@@ -1549,7 +1549,7 @@ AP_DECLARE(void) ap_send_error_response(
+                       "ErrorDocument to handle the request.</p>\n", NULL);
+         }
+         ap_rvputs_proto_in_ascii(r, ap_psignature("<hr>\n", r), NULL);
+-        ap_rvputs_proto_in_ascii(r, "</body></html>\n", NULL);
++        ap_rvputs_proto_in_ascii(r, "</body></html>\n", NULL);*/
+     }
+     ap_finalize_request_protocol(r);
+ }
