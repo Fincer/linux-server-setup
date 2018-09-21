@@ -1,13 +1,15 @@
 ###############################
 # SIMPLE FIREWALL RULES FOR IPTABLES
 #
-# By Pekka Helenius (~Fincer), 2018
 #
 # These rules are intended to be used
-# without UFW. If you have additional
-# firewall settings in your system/iptables, 
-# take care adapting these rules in to your 
-# current firewall ruleset.
+# without other firewalls such as UFW. 
+# If you have additional firewall settings
+# in your system/iptables, take care adapting 
+# these rules in to your current firewall ruleset.
+#
+# It is highly recommended to remove all conflicting
+# firewall configuration
 #
 # I do not take responsibility of breaking
 # your working firewall configuration!
@@ -19,14 +21,13 @@
 # A) do not respond to incoming ping requests
 # Can be used as a replacement for sysctl 'net.ipv4.icmp_echo_ignore_all=1' setting
 #
-# B) drop all incoming traffic by default, except for
+# B) Reject connection if connection cycle is too intense
+# from one client. This setting may be useful against all kind of intense brute force
+# attacks.
+#
+# C) drop all incoming traffic by default, except for
 # SSH, HTTP and HTTPS protocols
 #
-# C) start dropping packets if connection cycle is too intense
-# from one client. This setting may be useful against port scanners.
-#
-# Ruleset C) by Anthony Maro:
-# https://www.ossramblings.com/using_iptables_rate_limiting_to_prevent_portscans
 #
 ############
 #
@@ -53,7 +54,7 @@
 #        HTTP: 80
 #        HTTPS: 443
 #
-# Default setting for C) is 10 maximum connection attempts in 30 seconds
+# Default setting for bruteforce prevention is 10 maximum connection attempts in 30 seconds
 # Adapt the values to your server environment.
 #
 # 5) Save this file to /etc/iptables/iptables.rules
@@ -79,6 +80,7 @@
 #
 # https://www.thegeekstuff.com/scripts/iptables-rules
 # https://gist.github.com/thomasfr/9712418
+# http://blog.sevagas.com/?Iptables-firewall-versus-nmap-and,31
 #
 ###############################
 #
@@ -88,75 +90,80 @@
 *filter
 
 ###############################
-# DEFAULT POLICY FOR THIS CHAIN - DROP ALL INPUT TRAFFIC
+# Default policy for this chain - drop all input traffic
+# This is a dangerous setting. If you drop all incoming connections,
+# make sure you have accepted at least incoming SSH connection below.
+# Otherwise you will be locked out from the server!
 #
-# THIS IS A DANGEROUS SETTING. IF YOU DROP ALL INCOMING
-# CONNECTIONS, MAKE SURE YOU HAVE ACCEPTED AT LEAST SSH CONNECTION INPUT BELOW
-# OTHERWISE YOU WILL BE LOCKED OUT FROM THE SERVER!
-#
-# DO NOT USE 'REJECT' BECAUSE IT GIVES A RESPONSE TO A HOSTILE CLIENTS (PORT SCANNERS)
-# INSTEAD, DROP INCOMING PACKETS AND DO NOT GIVE RESPONSE AT ALL
+# Do not use 'REJECT' because it gives a response to hostile clients such
+# as bruteforcers and port scanners. Instead, drop incoming packets
+# and do not give reponse at all.
 #
 
 -P INPUT DROP
 
 ###############################
-# WE ARE NOT A ROUTER, WE DROP ALL (NON-EXISTENT) FORWARD CONNECTIONS
+# We are not a router, we drop all (non-existent) forward connections
 #
 
 -P FORWARD DROP
 
 ###############################
-# BY DEFAULT, ALL OUTGOING TRAFFIC FROM THE SERVER IS ACCEPTED
+# By default, all outgoing traffic from the server is accepted
 #
 
 -P OUTPUT ACCEPT
 
 ###############################
-# DROP ALL INCOMING PING REQUESTS
+# Drop all incoming ping requests
 #
 
 -A INPUT -p icmp --icmp-type echo-request -j DROP
 
 ###############################
-# ALLOW LOOPBACK CONNECTIONS
+# Allow loopback connections
 #
 
 -A INPUT -i lo -j ACCEPT
 #-A OUTPUT -o lo -j ACCEPT
 
 ###############################
-# ALLOW INCOMING SSH CONNECTIONS
+# Block bruteforce attacks
+# Works against dirbuster, nmap and similar tools.
+#
+# 
+# Default values are allowing max 10 connections from a client within 30 seconds
+# Please adjust these values for your server environment
+#
+# Based on: https://rudd-o.com/linux-and-free-software/a-better-way-to-block-brute-force-attacks-on-your-ssh-server
+
+# If you need to enable this for specific TCP ports, add the following parameter:
+# -m multiport --dports 80
+
+-A INPUT -p tcp -m tcp -m state --state NEW -m recent --set --name BRUTEFORCE --rsource
+#-A INPUT -p tcp -m tcp -m multiport --dports 80 -m recent --rcheck --seconds 30 --hitcount 10 --rttl --name BRUTEFORCE --rsource -j LOG --log-prefix "Brute force attack detected "
+-A INPUT -p tcp -m tcp -m recent --rcheck --seconds 30 --hitcount 10 --rttl --name BRUTEFORCE --rsource -j REJECT --reject-with tcp-reset
+
+############################### 
+# Allow incoming SSH connections
 #
 
--A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
-#-A OUTPUT -p tcp --sport 22 -m state --state NEW -j ACCEPT
+-A INPUT -p tcp --dport 765 -m state --state NEW -j ACCEPT
+#-A OUTPUT -p tcp --sport 765 -m state --state NEW -j ACCEPT
 
 ###############################
-# ALLOW INCOMING HTTP/HTTPS CONNECTIONS
+# Allow incoming HTTP/HTTPS connections
 #
 
 -A INPUT -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT
 #-A OUTPUT -p tcp -m multiport --sports 80,443 -m state --state NEW -j ACCEPT
 
 ###############################
-# ALLOW ESTABLISHED AND RELATED CONNECTIONS
+# Allow established and related connections
 #
 
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 #-A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-
-###############################
-# RULESET C)
-#
-# IF 10 NEW CONNECTIONS TO ANY PORT WITHIN 30 SECONDS IS REQUESTED BY A CLIENT, START DROPPING PACKETS FOR THE CLIENT
-#
-# SHOULD FREEZE NMAP AND OTHER PORT SCANNERS
-#
-# Source: https://www.ossramblings.com/using_iptables_rate_limiting_to_prevent_portscans
-
--A INPUT -i $IFACE -p tcp -m state --state NEW -m recent --set --name DEFAULT --mask 255.255.255.255 --rsource
--A INPUT -i $IFACE -p tcp -m state --state NEW -m recent --update --seconds 30 --hitcount 10 --name DEFAULT --mask 255.255.255.255 --rsource -j DROP
 
 ###############################
 
