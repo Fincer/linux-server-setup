@@ -1,0 +1,165 @@
+###############################
+# SIMPLE FIREWALL RULES FOR IPTABLES
+#
+# By Pekka Helenius (~Fincer), 2018
+#
+# These rules are intended to be used
+# without UFW. If you have additional
+# firewall settings in your system/iptables, 
+# take care adapting these rules in to your 
+# current firewall ruleset.
+#
+# I do not take responsibility of breaking
+# your working firewall configuration!
+#
+############
+#
+# The rules in this file do the following:
+#
+# A) do not respond to incoming ping requests
+# Can be used as a replacement for sysctl 'net.ipv4.icmp_echo_ignore_all=1' setting
+#
+# B) drop all incoming traffic by default, except for
+# SSH, HTTP and HTTPS protocols
+#
+# C) start dropping packets if connection cycle is too intense
+# from one client. This setting may be useful against port scanners.
+#
+# Ruleset C) by Anthony Maro:
+# https://www.ossramblings.com/using_iptables_rate_limiting_to_prevent_portscans
+#
+############
+#
+# INSTALLATION
+#
+# NOTE: Intended to be used without UFW or any other
+# firewall settings!!
+#
+# 1) Recommended: Remove existing firewall front-ends such as UFW from your system 
+#
+# 2) Delete all previous firewall rules by issuing
+#    sudo iptables --flush && sudo iptables --delete-chain
+#
+# 3) Check output of 'iptables -S'. It should be
+#    -P INPUT ACCEPT
+#    -P FORWARD ACCEPT
+#    -P OUTPUT ACCEPT
+#
+# 4) In this file, change SSH, HTTP and HTTPS port numbers to fit your server environment
+#
+#    Default values are:
+#
+#        SSH: 22
+#        HTTP: 80
+#        HTTPS: 443
+#
+# Default setting for C) is 10 maximum connection attempts in 30 seconds
+# Adapt the values to your server environment.
+#
+# 5) Save this file to /etc/iptables/iptables.rules
+#
+# 6) Check that it is used by 'iptables-restore' command
+#
+# In systemd environments, check the value of 'ExecStart' and 'ExecReload'
+# in file /lib/systemd/system/iptables.service. The entries should be as follows:
+#
+#    ExecStart=/usr/bin/iptables-restore /etc/iptables/iptables.rules
+#    ExecReload=/usr/bin/iptables-restore /etc/iptables/iptables.rules
+#
+# 7) Once you have double-checked that the parameters in this file are correct (step 4), run
+#    sudo iptables-restore /etc/iptables/iptables.rules
+#    sudo systemctl enable iptables && sudo systemctl start iptables
+#
+# 8) Check that the rules have been applied:
+#    sudo iptables -S
+#
+#
+###############################
+# USEFUL LINKS
+#
+# https://www.thegeekstuff.com/scripts/iptables-rules
+# https://gist.github.com/thomasfr/9712418
+#
+###############################
+#
+# BEGINNING OF FIREWALL RULES
+#
+
+*filter
+
+###############################
+# DEFAULT POLICY FOR THIS CHAIN - DROP ALL INPUT TRAFFIC
+#
+# THIS IS A DANGEROUS SETTING. IF YOU DROP ALL INCOMING
+# CONNECTIONS, MAKE SURE YOU HAVE ACCEPTED AT LEAST SSH CONNECTION INPUT BELOW
+# OTHERWISE YOU WILL BE LOCKED OUT FROM THE SERVER!
+#
+# DO NOT USE 'REJECT' BECAUSE IT GIVES A RESPONSE TO A HOSTILE CLIENTS (PORT SCANNERS)
+# INSTEAD, DROP INCOMING PACKETS AND DO NOT GIVE RESPONSE AT ALL
+#
+
+-P INPUT DROP
+
+###############################
+# WE ARE NOT A ROUTER, WE DROP ALL (NON-EXISTENT) FORWARD CONNECTIONS
+#
+
+-P FORWARD DROP
+
+###############################
+# BY DEFAULT, ALL OUTGOING TRAFFIC FROM THE SERVER IS ACCEPTED
+#
+
+-P OUTPUT ACCEPT
+
+###############################
+# DROP ALL INCOMING PING REQUESTS
+#
+
+-A INPUT -p icmp --icmp-type echo-request -j DROP
+
+###############################
+# ALLOW LOOPBACK CONNECTIONS
+#
+
+-A INPUT -i lo -j ACCEPT
+#-A OUTPUT -o lo -j ACCEPT
+
+###############################
+# ALLOW INCOMING SSH CONNECTIONS
+#
+
+-A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+#-A OUTPUT -p tcp --sport 22 -m state --state NEW -j ACCEPT
+
+###############################
+# ALLOW INCOMING HTTP/HTTPS CONNECTIONS
+#
+
+-A INPUT -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT
+#-A OUTPUT -p tcp -m multiport --sports 80,443 -m state --state NEW -j ACCEPT
+
+###############################
+# ALLOW ESTABLISHED AND RELATED CONNECTIONS
+#
+
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+#-A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+###############################
+# RULESET C)
+#
+# IF 10 NEW CONNECTIONS TO ANY PORT WITHIN 30 SECONDS IS REQUESTED BY A CLIENT, START DROPPING PACKETS FOR THE CLIENT
+#
+# SHOULD FREEZE NMAP AND OTHER PORT SCANNERS
+#
+# Source: https://www.ossramblings.com/using_iptables_rate_limiting_to_prevent_portscans
+
+-A INPUT -i $IFACE -p tcp -m state --state NEW -m recent --set --name DEFAULT --mask 255.255.255.255 --rsource
+-A INPUT -i $IFACE -p tcp -m state --state NEW -m recent --update --seconds 30 --hitcount 10 --name DEFAULT --mask 255.255.255.255 --rsource -j DROP
+
+###############################
+
+COMMIT
+
+# END OF FIREWALL RULES
