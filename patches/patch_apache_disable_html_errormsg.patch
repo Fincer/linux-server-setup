@@ -2,15 +2,15 @@ Author: Pekka Helenius (~Fincer), 2018
 
 Patch: Remove error HTML body from Apache server output message.
 
+This patch removes default Apache error pages returned by an erroneous HTTP request.
 Removes additional error messages as well.
-Do not give any hints about existence of Apache ErrorDocument to the client.
+Do not give any hints about existence of Apache ErrorDocument directive to the client.
 
-This patch is useful in some cases but can bury underneath problems in server
-configuration. Thus, use discretion before implementing the patch
+This patch is useful in some cases but can bury underneath problems in server configuration. 
+Thus, use discretion before implementing the patch
 in your Apache server.
 
-This patch removes default error pages returned by an erroneous HTTP request.
-If you need to use error pages, customize them in your Apache configs with ErrorDocument.
+If you need to use error pages, customize them in your Apache configs with ErrorDocument directive.
 
 --- a/modules/http/http_protocol.c
 +++ b/modules/http/http_protocol.c
