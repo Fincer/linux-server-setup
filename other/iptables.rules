@@ -129,8 +129,8 @@
 
 ###############################
 # Block bruteforce attacks
-# Works against dirbuster, nmap and similar tools.
-#
+# Works against agressive scanning techniques possibly used by dirbuster, nmap and similar tools.
+# Please note that the following ruleset is tested only on a small server with low traffic.
 # 
 # Default values are allowing max 10 connections from a client within 30 seconds
 # Please adjust these values for your server environment
