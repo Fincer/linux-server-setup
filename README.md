@@ -25,18 +25,18 @@ Administration of Linux server/client environment
 
 ## Table of contents
 
-- [Exercise 1 - Installation & getting familiar with a Linux OS](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h1.md)
+- [Exercise 1 - Installation & getting familiar with a Linux OS](exercises/h1.md)
 
-- [Exercise 2 - Simple log analysis](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h2.md)
+- [Exercise 2 - Simple log analysis](exercises/h2.md)
 
-- [Exercise 3 - Setting up Apache & PHP environments](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h3.md)
+- [Exercise 3 - Setting up Apache & PHP environments](exercises/h3.md)
 
-- [Exercise 4 - Apache web development environment configuration for a regular user](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h4.md)
+- [Exercise 4 - Apache web development environment configuration for a regular user](exercises/h4.md)
 
-- [Exercise 5 - SSH and Linux system statistics](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h5.md)
+- [Exercise 5 - SSH and Linux system statistics](exercises/h5.md)
 
-- [Exercise 6 - Hello World](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h6.md)
+- [Exercise 6 - Hello World](exercises/h6.md)
 
-- [Exercise 7 - Laboratory test](https://github.com/Fincer/linux-server-setup/blob/master/exercises/h7.md)
+- [Exercise 7 - Laboratory test](exercises/h7.md)
 
-- [Exam structure](https://github.com/Fincer/linux-server-setup/blob/master/exercises/exam.md)
+- [Exam structure](exercises/exam.md)
